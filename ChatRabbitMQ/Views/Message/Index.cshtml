@@ -1,0 +1,31 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<div id="messageList"></div>
+<input type="text" id="messageInput"></input>
+<button onClick="sendMessage()">Send</button>
+
+<script>
+    const connection = new signalR.HubConnectionBuilder().withUrl("/chathub").build();
+
+    connection.on("ConsumeMessage", (user, message) => {
+        const msg = document.createElement("div");
+        msg.textContent = `${user}: ${message}`;
+        document.getElementById("messageList").appendChild(msg);
+    });
+
+    connection.start().catch(err => console.error(err.toString()));
+
+    function sendMessage() {
+        const message = document.getElementById("messageInput").value;
+        fetch('/message/sendmessage', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(message)
+        });
+    }
+</script>

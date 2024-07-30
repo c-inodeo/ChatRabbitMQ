@@ -1,4 +1,5 @@
-﻿using RabbitMQ.Client;
+﻿using Microsoft.AspNetCore.Mvc;
+using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace ChatRabbitMQ.Service
                 arguments: null
             );
         }
-        public void SendMessage(string message)
+        public void SendMessage([FromBody] string message)
         {
             var body = Encoding.UTF8.GetBytes(message);
             _channel.BasicPublish(
@@ -37,7 +38,7 @@ namespace ChatRabbitMQ.Service
                 body: body
             );
         }
-        public void ReceiveMessage(Action<string> handleMessage) 
+        public void ConsumeMessage(Action<string> handleMessage) 
         {
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (model, ea) =>
