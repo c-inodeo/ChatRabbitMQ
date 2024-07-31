@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using ChatRabbitMQ.Model;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,8 +30,8 @@ namespace ChatRabbitMQ.Service
         {
             _rabbitMQService.ConsumeMessage(async message =>
             {
-                _logger.LogInformation($"Received message from RabbitMQ: {message} \r\n");
-                await _chatHub.Clients.All.SendAsync("ConsumeMessage", "RabbitMQ", message);
+                _logger.LogInformation($"Received message from RabbitMQ: {message.Content} \r\n");
+                await _chatHub.Clients.All.SendAsync("ConsumeMessage", message.Sender, message.Content);
                 _logger.LogInformation($"Message sent to SignalR clients - Consumer Service \r\n");
 
             });

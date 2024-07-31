@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Hosting;
+using ChatRabbitMQ.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,10 +24,11 @@ namespace ChatRabbitMQ.Service
             {
                 while (!cancellationToken.IsCancellationRequested) 
                 { 
-                    var message = Console.ReadLine();
+                    var content = Console.ReadLine();
+                    var message = new MessageModel("Console", content);
                     _rabbitmqService.SendMessage(message);
-                    Console.Write($"Message sent: {message} \r\n ");
-                    await _hubContext.Clients.All.SendAsync("ConsumeMessage", "Console", message);
+                    Console.Write($"Message sent: {message.Content} \r\n ");
+                    await _hubContext.Clients.All.SendAsync("ConsumeMessage", message.Sender, message.Content);
                 }
             });
             return Task.CompletedTask;

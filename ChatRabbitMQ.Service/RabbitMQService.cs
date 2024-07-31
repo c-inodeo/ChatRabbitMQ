@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ChatRabbitMQ.Model;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System;
@@ -28,9 +30,10 @@ namespace ChatRabbitMQ.Service
                 arguments: null
             );
         }
-        public void SendMessage([FromBody] string message)
+        public void SendMessage(MessageModel message)
         {
-            var body = Encoding.UTF8.GetBytes(message);
+            var json = JsonConvert.SerializeObject(message);
+            var body = Encoding.UTF8.GetBytes(json);
             _channel.BasicPublish(
                 exchange:"",
                 routingKey:"message_queue",
@@ -38,13 +41,14 @@ namespace ChatRabbitMQ.Service
                 body: body
             );
         }
-        public void ConsumeMessage(Action<string> handleMessage) 
+        public void ConsumeMessage(Action<MessageModel> handleMessage) 
         {
             var consumer = new EventingBasicConsumer(_channel);
             consumer.Received += (model, ea) =>
             { 
                 var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
+                var json = Encoding.UTF8.GetString(body);
+                var message = JsonConvert.DeserializeObject<MessageModel>(json);
                 handleMessage(message);
             };
             _channel.BasicConsume(

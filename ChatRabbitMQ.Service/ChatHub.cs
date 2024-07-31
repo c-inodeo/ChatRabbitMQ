@@ -18,7 +18,7 @@ namespace ChatRabbitMQ.Service
         }
         public async Task SendMessage(string user, string message) 
         {
-            _logger.LogInformation($"Received message from {user} : {message} \r\n");
+            //_logger.LogInformation($"Received message from {user} : {message} \r\n");
             await Clients.All.SendAsync("ConsumeMessage",user, message);
             _logger.LogInformation($"Message broadcasted to SignalR clients - ChatHub Service \r\n");
 

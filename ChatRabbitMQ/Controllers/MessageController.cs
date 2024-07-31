@@ -1,4 +1,5 @@
-﻿using ChatRabbitMQ.Service;
+﻿using ChatRabbitMQ.Model;
+using ChatRabbitMQ.Service;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ChatRabbitMQ.Controllers
@@ -11,7 +12,7 @@ namespace ChatRabbitMQ.Controllers
             _rabbitmqService = rabbitMQService;
         }
         [HttpPost]
-        public IActionResult SendMessage([FromBody] string message) 
+        public IActionResult SendMessage([FromBody] MessageModel message) 
         {
             _rabbitmqService.SendMessage(message);
             return Ok();

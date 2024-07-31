@@ -10,16 +10,22 @@
 <script>
     const connection = new signalR.HubConnectionBuilder().withUrl("/chathub").build();
 
-    connection.on("ConsumeMessage", (user, message) => {
+    connection.on("ConsumeMessage", (sender, content) => {
         const msg = document.createElement("div");
-        msg.textContent = `${user}: ${message}`;
+        msg.textContent = `${sender}: ${content}`;
         document.getElementById("messageList").appendChild(msg);
     });
 
     connection.start().catch(err => console.error(err.toString()));
 
     function sendMessage() {
-        const message = document.getElementById("messageInput").value;
+
+        const messageContent = document.getElementById("messageInput").value;
+        const message = {
+            Sender: "WebClient",
+            Content: messageContent
+        };
+
         fetch('/message/sendmessage', {
             method: 'POST',
             headers: {
